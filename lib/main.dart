@@ -11,27 +11,32 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ExpandedWidget(title: 'ExpandedWidget'),
+      home: ContainerWidget(title: 'Container Widget Demo'),
     );
   }
 }
 
-ExpandedWidgetState pageState;
+ContainerWidgetState pageState;
 
-class ExpandedWidget extends StatefulWidget {
-  ExpandedWidget({Key key, this.title}) : super(key: key);
+class ContainerWidget extends StatefulWidget {
+  ContainerWidget({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ExpandedWidgetState createState(){
-    pageState = ExpandedWidgetState();
+  ContainerWidgetState createState(){
+    pageState = ContainerWidgetState();
     return pageState;
   }
 }
 
-class ExpandedWidgetState extends State<ExpandedWidget>{
-  List<int> flexList = [1, 1, 1, 1, 1, 1];
+class ContainerWidgetState extends State<ContainerWidget>{
+  double _height = 100;
+  double _width = 100;
+  double _padding = 1;
+  double _margin = 1;
+  double _border = 1;
+  Color _bgColor = Colors.red;
 
   @override
   Widget build(BuildContext context){
@@ -39,92 +44,146 @@ class ExpandedWidgetState extends State<ExpandedWidget>{
       appBar: AppBar(title: Text(widget.title)),
       body: ListView(
         children: <Widget>[
-          Text("Row"),
           Container(
-            decoration: BoxDecoration(
-                color: Colors.grey[200],
-                border: Border.all(color: Colors.indigo, width: 0.5)
-            ),
-            height: 100,
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: flexList[0],
-                  child: boxWidget(0),
-                ),
-                Expanded(
-                  flex: flexList[1],
-                  child: boxWidget(1),
-                ),
-                Expanded(
-                  flex: flexList[2],
-                  child: boxWidget(2),
-                ),
-              ],
-            ),
-          ),
-          Text("\nColumn"),
-          Container(
-            decoration: BoxDecoration(
-                color: Colors.grey[200],
-                border: Border.all(color: Colors.indigo, width: 0.5)
-            ),
             height: 300,
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  flex: flexList[3],
-                  child: boxWidget(3),
+            child: Center(
+              child: Container(
+                height: _height,
+                width: _width,
+                padding: EdgeInsets.all(_padding),
+                margin: EdgeInsets.all(_margin),
+                decoration: BoxDecoration(
+                  color: _bgColor, border: Border.all(width: _border)
                 ),
-                Expanded(
-                  flex: flexList[4],
-                  child: boxWidget(4),
+                child: Text(
+                  "This is a Container",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold
+                  ),
                 ),
-                Expanded(
-                  flex: flexList[5],
-                  child: boxWidget(5),
-                ),
-              ],
+              ),
             ),
           ),
-          Center(
-            child: FlatButton(
-              color: Colors.orange,
-              child: Text("reset", style: TextStyle(color: Colors.white)),
-              onPressed: (){
-                setState((){
-                  flexList = [1, 1, 1, 1, 1, 1];
-                });
-              },
-            ),
+          Divider(height: 2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Text("Height"),
+              Slider(
+                value: _height,
+                min: 50,
+                max: 300,
+                onChanged: (newValue){
+                  setState((){
+                    _height = newValue;
+                  });
+                },
+              ),
+              Text(_height.toInt().toString()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Text("Width"),
+              Slider(
+                value: _width,
+                min: 50,
+                max: 300,
+                onChanged: (newValue) {
+                  setState((){
+                    _width = newValue;
+                  });
+                },
+              ),
+              Text(_width.toInt().toString()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Text("Padding"),
+              Slider(
+                value: _padding,
+                min: 0,
+                max: 100,
+                onChanged: (newValue) {
+                  setState((){
+                    _padding = newValue;
+                  });
+                },
+              ),
+              Text(_padding.toInt().toString()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Text("Margin"),
+              Slider(
+                value: _margin,
+                min: 0,
+                max: 50,
+                onChanged: (newValue) {
+                  setState((){
+                    _margin = newValue;
+                  });
+                },
+              ),
+              Text(_margin.toInt().toString()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Text("Border"),
+              Slider(
+                value: _border,
+                min: 0,
+                max: 50,
+                onChanged: (newValue) {
+                  setState((){
+                    _border = newValue;
+                  });
+                },
+              ),
+              Text(_border.toInt().toString()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Text("Color"),
+              RaisedButton(
+                child: Text("Red"),
+                onPressed: (){
+                  setState((){
+                    _bgColor = Colors.red;
+                  });
+                },
+              ),
+              RaisedButton(
+                child: Text("Blue"),
+                onPressed:(){
+                  setState((){
+                    _bgColor = Colors.blue;
+                  });
+                },
+              ),
+              RaisedButton(
+                child: Text("Orange"),
+                onPressed: (){
+                  setState((){
+                    _bgColor = Colors.orange;
+                  });
+                },
+              ),
+            ],
           ),
         ],
       ),
-    );
-  }
-
-  boxWidget(int flexIndex){
-    return GestureDetector(
-      child: Container(
-        decoration: BoxDecoration(
-            color: Colors.blue[400],
-            border: Border.all(color: Colors.indigo, width: 0.5)
-        ),
-        child: Center(
-          child: Text("flex: ${flexList[flexIndex]}",
-              style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold
-              )),
-        ),
-      ),
-      onTap: (){
-        print(flexIndex);
-        setState((){
-          flexList[flexIndex] = flexList[flexIndex] + 1;
-        });
-      },
     );
   }
 }
