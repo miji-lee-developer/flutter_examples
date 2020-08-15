@@ -11,178 +11,94 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ContainerWidget(title: 'Container Widget Demo'),
+      home: SnackBarWidget(title: 'SnackBar Demo'),
     );
   }
 }
 
-ContainerWidgetState pageState;
+SnackBarWidgetState pageState;
 
-class ContainerWidget extends StatefulWidget {
-  ContainerWidget({Key key, this.title}) : super(key: key);
+class SnackBarWidget extends StatefulWidget {
+  SnackBarWidget({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ContainerWidgetState createState(){
-    pageState = ContainerWidgetState();
+  SnackBarWidgetState createState() {
+    pageState = SnackBarWidgetState();
     return pageState;
   }
 }
 
-class ContainerWidgetState extends State<ContainerWidget>{
-  double _height = 100;
-  double _width = 100;
-  double _padding = 1;
-  double _margin = 1;
-  double _border = 1;
-  Color _bgColor = Colors.red;
+class SnackBarWidgetState extends State<SnackBarWidget> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(title: Text(widget.title)),
       body: ListView(
         children: <Widget>[
-          Container(
-            height: 300,
-            child: Center(
-              child: Container(
-                height: _height,
-                width: _width,
-                padding: EdgeInsets.all(_padding),
-                margin: EdgeInsets.all(_margin),
-                decoration: BoxDecoration(
-                  color: _bgColor, border: Border.all(width: _border)
-                ),
-                child: Text(
-                  "This is a Container",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold
+          RaisedButton(
+            child: Text("Show Snackbar - call directly"),
+            onPressed: (){
+              scaffoldKey.currentState.showSnackBar(
+                SnackBar(
+                  content: Text("Did you call me?"),
+                  backgroundColor: Colors.orange,
+                  action: SnackBarAction(
+                    label: "Done",
+                    textColor: Colors.white,
+                    onPressed: (){},
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
-          Divider(height: 2),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Text("Height"),
-              Slider(
-                value: _height,
-                min: 50,
-                max: 300,
-                onChanged: (newValue){
-                  setState((){
-                    _height = newValue;
-                  });
-                },
-              ),
-              Text(_height.toInt().toString()),
-            ],
+          RaisedButton(
+            child: Text("Show Snackbar - with method"),
+            onPressed: (){
+              showSnackbarWithKey();
+            },
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Text("Width"),
-              Slider(
-                value: _width,
-                min: 50,
-                max: 300,
-                onChanged: (newValue) {
-                  setState((){
-                    _width = newValue;
-                  });
-                },
-              ),
-              Text(_width.toInt().toString()),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Text("Padding"),
-              Slider(
-                value: _padding,
-                min: 0,
-                max: 100,
-                onChanged: (newValue) {
-                  setState((){
-                    _padding = newValue;
-                  });
-                },
-              ),
-              Text(_padding.toInt().toString()),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Text("Margin"),
-              Slider(
-                value: _margin,
-                min: 0,
-                max: 50,
-                onChanged: (newValue) {
-                  setState((){
-                    _margin = newValue;
-                  });
-                },
-              ),
-              Text(_margin.toInt().toString()),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Text("Border"),
-              Slider(
-                value: _border,
-                min: 0,
-                max: 50,
-                onChanged: (newValue) {
-                  setState((){
-                    _border = newValue;
-                  });
-                },
-              ),
-              Text(_border.toInt().toString()),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Text("Color"),
-              RaisedButton(
-                child: Text("Red"),
-                onPressed: (){
-                  setState((){
-                    _bgColor = Colors.red;
-                  });
-                },
-              ),
-              RaisedButton(
-                child: Text("Blue"),
-                onPressed:(){
-                  setState((){
-                    _bgColor = Colors.blue;
-                  });
-                },
-              ),
-              RaisedButton(
-                child: Text("Orange"),
-                onPressed: (){
-                  setState((){
-                    _bgColor = Colors.orange;
-                  });
-                },
-              ),
-            ],
+          RaisedButton(
+            child: Text("Show Snackbar - with other class"),
+            onPressed: () {
+              SnackBarManager.showSnackBar(scaffoldKey, "Hello");
+            },
           ),
         ],
+      ),
+    );
+  }
+
+  showSnackbarWithKey() {
+    scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text("Did you call me?"),
+        backgroundColor: Colors.blue,
+        action: SnackBarAction(
+          label: "Done",
+          textColor: Colors.white,
+          onPressed: () {},
+        ),
+      ),
+    );
+  }
+}
+
+class SnackBarManager {
+  static void showSnackBar(GlobalKey<ScaffoldState> scaffoldKey, String message) {
+    scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text(message + ", Did you call me?"),
+        backgroundColor: Colors.red,
+        action: SnackBarAction(
+          label: "Done",
+          textColor: Colors.white,
+          onPressed: () {},
+        ),
       ),
     );
   }
