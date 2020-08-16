@@ -96,4 +96,63 @@ class SharedPreferencesDemoState extends State<SharedPreferencesDemo> {
       ),
     );
   }
+
+  getCounter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      counter = (prefs.getInt("counter") ?? 0);
+    });
+  }
+
+  setCounter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs.setInt("counter", counter);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.title)),
+      body: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              height: 40,
+              child: FloatingActionButton(
+                heroTag: "add",
+                child: Icon(Icons.remove),
+                onPressed: () {
+                  setState(() {
+                    counter--;
+                  });
+                  setCounter();
+                },
+              ),
+            ),
+            Text("Shared Preferences value: "),
+            Text(
+              "${counter.toString()}",
+              style: TextStyle(fontSize: 30),
+            ),
+            SizedBox(
+              height: 40,
+              child: FloatingActionButton(
+                heroTag: "remove",
+                child: Icon(Icons.add),
+                onPressed: () {
+                  setState(() {
+                    counter++;
+                  });
+                  setCounter();
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
