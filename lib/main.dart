@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,143 +11,84 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SharedPreferencesDemo(title: 'Shared Preferences Demo'),
+      home: NaviFirstScreen(title: 'First Screen'),
     );
   }
 }
 
-SharedPreferencesDemoState pageState;
+NaviFirstScreenState pageState;
 
-class SharedPreferencesDemo extends StatefulWidget {
-  SharedPreferencesDemo({Key key, this.title}) : super(key: key);
+class NaviFirstScreen extends StatefulWidget {
+  NaviFirstScreen({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  SharedPreferencesDemoState createState() {
-    pageState = SharedPreferencesDemoState();
+  NaviFirstScreenState createState() {
+    pageState = NaviFirstScreenState();
     return pageState;
   }
 }
 
-class SharedPreferencesDemoState extends State<SharedPreferencesDemo> {
-  int counter;
-
-  @override
-  void initState() {
-    super.initState();
-    getCounter();
-  }
-
-  getCounter() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      counter = (prefs.getInt("counter") ?? 0);
-    });
-  }
-
-  setCounter() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt("counter", counter);
-  }
-
+class NaviFirstScreenState extends State<NaviFirstScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: Center(
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SizedBox(
-              height: 40,
-              child: FloatingActionButton(
-                heroTag: "remove",
-                child: Icon(Icons.remove),
-                onPressed: () {
-                  setState(() {
-                    counter--;
-                  });
-                  setCounter();
-                },
+            Container(
+              height: 70,
+              width: 250,
+              decoration: BoxDecoration(color: Colors.orange),
+              alignment: Alignment(0, 0),
+              child: Text(
+                "This is the First Screen",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
-            Text("Shared preferences value: "),
-            Text(
-              "${counter.toString()}",
-              style: TextStyle(fontSize: 30),
-            ),
-            SizedBox(
-              height: 40,
-              child: FloatingActionButton(
-                heroTag: "add",
-                child: Icon(Icons.add),
-                onPressed: () {
-                  setState(() {
-                    counter++;
-                  });
-                  setCounter();
-                },
-              ),
+            RaisedButton(
+              child: Text("Launch Screen"),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NaviSecondScreen()),
+                );
+              },
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  getCounter() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      counter = (prefs.getInt("counter") ?? 0);
-    });
-  }
-
-  setCounter() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      prefs.setInt("counter", counter);
-    });
-  }
-
+class NaviSecondScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text("Second Screen")),
       body: Center(
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SizedBox(
-              height: 40,
-              child: FloatingActionButton(
-                heroTag: "add",
-                child: Icon(Icons.remove),
-                onPressed: () {
-                  setState(() {
-                    counter--;
-                  });
-                  setCounter();
-                },
+            Container(
+              height: 70,
+              width: 250,
+              decoration: BoxDecoration(color: Colors.indigoAccent),
+              alignment: Alignment(0, 0),
+              child: Text(
+                "This is the Second Screen",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
-            Text("Shared Preferences value: "),
-            Text(
-              "${counter.toString()}",
-              style: TextStyle(fontSize: 30),
-            ),
-            SizedBox(
-              height: 40,
-              child: FloatingActionButton(
-                heroTag: "remove",
-                child: Icon(Icons.add),
-                onPressed: () {
-                  setState(() {
-                    counter++;
-                  });
-                  setCounter();
-                },
-              ),
+            RaisedButton(
+              child: Text("Go back to First Screen"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
           ],
         ),
