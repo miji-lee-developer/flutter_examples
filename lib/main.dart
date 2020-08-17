@@ -11,84 +11,69 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: NaviFirstScreen(title: 'First Screen'),
+      home: NaviSendData(title: 'First Screen'),
     );
   }
 }
 
-NaviFirstScreenState pageState;
+NaviSendDataState pageState;
 
-class NaviFirstScreen extends StatefulWidget {
-  NaviFirstScreen({Key key, this.title}) : super(key: key);
+class NaviSendData extends StatefulWidget {
+  NaviSendData({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  NaviFirstScreenState createState() {
-    pageState = NaviFirstScreenState();
+  NaviSendDataState createState() {
+    pageState = NaviSendDataState();
     return pageState;
   }
 }
 
-class NaviFirstScreenState extends State<NaviFirstScreen> {
+class NaviSendDataState extends State<NaviSendData> {
+  List<String> fruits = ['Apples', 'Oranges', 'Bananas'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              height: 70,
-              width: 250,
-              decoration: BoxDecoration(color: Colors.orange),
-              alignment: Alignment(0, 0),
-              child: Text(
-                "This is the First Screen",
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-            RaisedButton(
-              child: Text("Launch Screen"),
-              onPressed: () {
+      body: ListView.builder(
+        itemCount: fruits.length,
+        itemBuilder: (context, index) {
+          return Card(
+            child: ListTile(
+              title: Text("${fruits[index]}"),
+              onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NaviSecondScreen()),
+                  MaterialPageRoute(builder: (context) => NaviReceiveData(fruits[index]))
                 );
               },
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 }
 
-class NaviSecondScreen extends StatelessWidget {
+class NaviReceiveData extends StatelessWidget {
+  final String fruit;
+
+  NaviReceiveData(this.fruit);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Second Screen")),
       body: Center(
-        child: Column(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Container(
-              height: 70,
-              width: 250,
-              decoration: BoxDecoration(color: Colors.indigoAccent),
-              alignment: Alignment(0, 0),
-              child: Text(
-                "This is the Second Screen",
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-            RaisedButton(
-              child: Text("Go back to First Screen"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+            Text("Received Data: "),
+            Text(
+              fruit,
+              style: TextStyle(fontSize: 20),
             ),
           ],
         ),
