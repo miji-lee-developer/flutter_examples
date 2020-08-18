@@ -11,32 +11,59 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: NaviSendData(title: 'First Screen'),
+      home: NaviGetData(title: 'First Screen'),
     );
   }
 }
 
-NaviSendDataState pageState;
+NaviGetDataState pageState;
 
-class NaviSendData extends StatefulWidget {
-  NaviSendData({Key key, this.title}) : super(key: key);
+class NaviGetData extends StatefulWidget {
+  NaviGetData({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  NaviSendDataState createState() {
-    pageState = NaviSendDataState();
+  NaviGetDataState createState() {
+    pageState = NaviGetDataState();
     return pageState;
   }
 }
 
-class NaviSendDataState extends State<NaviSendData> {
-  List<String> fruits = ['Apples', 'Oranges', 'Bananas'];
+class NaviGetDataState extends State<NaviGetData> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(title: Text(widget.title)),
+      body: Center(
+        child: RaisedButton(
+          child: Text("Launch Screen"),
+          onPressed: () {
+            receiveData(context);
+          },
+        ),
+      ),
+    );
+  }
+
+  receiveData(BuildContext context) async {
+    String result = await Navigator.push(context, MaterialPageRoute(builder: (context) => NaviReturnData()));
+    scaffoldKey.currentState
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text("Received Data: $result")));
+  }
+}
+
+class NaviReturnData extends StatelessWidget {
+  List<String> fruits = ["Apples", "Oranges", "Bananas"];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Second Screen")),
       body: ListView.builder(
         itemCount: fruits.length,
         itemBuilder: (context, index) {
@@ -44,39 +71,11 @@ class NaviSendDataState extends State<NaviSendData> {
             child: ListTile(
               title: Text("${fruits[index]}"),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NaviReceiveData(fruits[index]))
-                );
+                Navigator.pop(context, fruits[index]);
               },
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class NaviReceiveData extends StatelessWidget {
-  final String fruit;
-
-  NaviReceiveData(this.fruit);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Second Screen")),
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("Received Data: "),
-            Text(
-              fruit,
-              style: TextStyle(fontSize: 20),
-            ),
-          ],
-        ),
       ),
     );
   }
