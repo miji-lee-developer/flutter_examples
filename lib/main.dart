@@ -11,26 +11,26 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: NaviGetData(title: 'First Screen'),
+      home: AlertDialogDemo(title: 'AlertDialog Demo'),
     );
   }
 }
 
-NaviGetDataState pageState;
+AlertDialogDemoState pageState;
 
-class NaviGetData extends StatefulWidget {
-  NaviGetData({Key key, this.title}) : super(key: key);
+class AlertDialogDemo extends StatefulWidget {
+  AlertDialogDemo({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  NaviGetDataState createState() {
-    pageState = NaviGetDataState();
+  AlertDialogDemoState createState() {
+    pageState = AlertDialogDemoState();
     return pageState;
   }
 }
 
-class NaviGetDataState extends State<NaviGetData> {
+class AlertDialogDemoState extends State<AlertDialogDemo> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -40,42 +40,52 @@ class NaviGetDataState extends State<NaviGetData> {
       appBar: AppBar(title: Text(widget.title)),
       body: Center(
         child: RaisedButton(
-          child: Text("Launch Screen"),
+          child: Text("Show AlertDialog"),
           onPressed: () {
-            receiveData(context);
+            showAlertDialog(context);
           },
         ),
       ),
     );
   }
 
-  receiveData(BuildContext context) async {
-    String result = await Navigator.push(context, MaterialPageRoute(builder: (context) => NaviReturnData()));
-    scaffoldKey.currentState
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text("Received Data: $result")));
-  }
-}
-
-class NaviReturnData extends StatelessWidget {
-  List<String> fruits = ["Apples", "Oranges", "Bananas"];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Second Screen")),
-      body: ListView.builder(
-        itemCount: fruits.length,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              title: Text("${fruits[index]}"),
-              onTap: () {
-                Navigator.pop(context, fruits[index]);
+  void showAlertDialog(BuildContext context) async {
+    String result = await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("AlertDialog Demo"),
+          content: Text("Select button you want"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.pop(context, "OK");
               },
             ),
-          );
-        },
+            FlatButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.pop(context, "Cancel");
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    scaffoldKey.currentState
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text("Result: $result"),
+        backgroundColor: (result == "OK") ? Colors.orange : Colors.blueAccent,
+        action: SnackBarAction(
+          label: "Done",
+          textColor: Colors.white,
+          onPressed: () {},
+        ),
       ),
     );
   }
