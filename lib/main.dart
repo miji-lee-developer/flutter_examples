@@ -11,82 +11,60 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: AlertDialogDemo(title: 'AlertDialog Demo'),
+      home: WillPopScopeDemo(title: 'WillPopScope Demo'),
     );
   }
 }
 
-AlertDialogDemoState pageState;
+WillPopScopeDemoState pageState;
 
-class AlertDialogDemo extends StatefulWidget {
-  AlertDialogDemo({Key key, this.title}) : super(key: key);
+class WillPopScopeDemo extends StatefulWidget {
+  WillPopScopeDemo({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  AlertDialogDemoState createState() {
-    pageState = AlertDialogDemoState();
+  WillPopScopeDemoState createState() {
+    pageState = WillPopScopeDemoState();
     return pageState;
   }
 }
 
-class AlertDialogDemoState extends State<AlertDialogDemo> {
+class WillPopScopeDemoState extends State<WillPopScopeDemo> {
+  DateTime currentBackPressTime;
+
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      appBar: AppBar(title: Text(widget.title)),
-      body: Center(
-        child: RaisedButton(
-          child: Text("Show AlertDialog"),
-          onPressed: () {
-            showAlertDialog(context);
-          },
+    return WillPopScope(
+      onWillPop: () async {
+        bool result = onPressBackButton();
+        return await Future.value(result);
+      },
+      child: Scaffold(
+        key: scaffoldKey,
+        appBar: AppBar(title: Text(widget.title)),
+        body: Center(
+          child: Text("Tap back button to leave this page"),
         ),
       ),
     );
   }
 
-  void showAlertDialog(BuildContext context) async {
-    String result = await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("AlertDialog Demo"),
-          content: Text("Select button you want"),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("OK"),
-              onPressed: () {
-                Navigator.pop(context, "OK");
-              },
-            ),
-            FlatButton(
-              child: Text("Cancel"),
-              onPressed: () {
-                Navigator.pop(context, "Cancel");
-              },
-            ),
-          ],
-        );
-      },
-    );
-
-    scaffoldKey.currentState
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text("Result: $result"),
-        backgroundColor: (result == "OK") ? Colors.orange : Colors.blueAccent,
-        action: SnackBarAction(
-          label: "Done",
-          textColor: Colors.white,
-          onPressed: () {},
-        ),
-      ),
-    );
+  bool onPressBackButton() {
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null || now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      scaffoldKey.currentState
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text("Tap back again to leave"),
+        )
+      );
+      return false;
+    }
+    return true;
   }
 }
