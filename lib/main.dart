@@ -31,9 +31,12 @@ class ListViewBasic extends StatefulWidget {
 }
 
 class ListViewBasicState extends State<ListViewBasic> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(title: Text(widget.title)),
       body: ListView(
         children: <Widget>[
@@ -49,6 +52,9 @@ class ListViewBasicState extends State<ListViewBasic> {
           ),
           RaisedButton(
             child: Text("4th Item - RaisedButton"),
+            onPressed:() {
+              onPressedButton();
+            },
           ),
           Card(
             child: Text("5th Item - Text in Card"),
@@ -60,5 +66,13 @@ class ListViewBasicState extends State<ListViewBasic> {
         ],
       ),
     );
+  }
+
+  void onPressedButton() {
+    scaffoldKey.currentState
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text("You pressed the button. Yay"))
+        );
   }
 }
