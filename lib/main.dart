@@ -11,68 +11,46 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ListViewBasic(title: 'ListView Demo - Basic'),
+      home: ListViewWithBuilder(title: 'ListView with builder'),
     );
   }
 }
 
-ListViewBasicState pageState;
+ListViewWithBuilderState pageState;
 
-class ListViewBasic extends StatefulWidget {
-  ListViewBasic({Key key, this.title}) : super(key: key);
+class ListViewWithBuilder extends StatefulWidget {
+  ListViewWithBuilder({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ListViewBasicState createState() {
-    pageState = ListViewBasicState();
+  ListViewWithBuilderState createState() {
+    pageState = ListViewWithBuilderState();
     return pageState;
   }
 }
 
-class ListViewBasicState extends State<ListViewBasic> {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
+class ListViewWithBuilderState extends State<ListViewWithBuilder> {
+  List<String> items;
+
+  ListViewWithBuilderState() {
+    items = List<String>.generate(100, (index) {
+      return "Item - $index";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
       appBar: AppBar(title: Text(widget.title)),
-      body: ListView(
-        children: <Widget>[
-          Text("First Item - Text"),
-          Container(
-            decoration: BoxDecoration(color: Colors.orange),
-            child: Text("Second Item - Text in Container"),
-          ),
-          ListTile(
-            leading: Icon(Icons.list),
-            title: Text("3rd Item"),
-            subtitle: Text("ListTile"),
-          ),
-          RaisedButton(
-            child: Text("4th Item - RaisedButton"),
-            onPressed:() {
-              onPressedButton();
-            },
-          ),
-          Card(
-            child: Text("5th Item - Text in Card"),
-          ),
-          Card(
-            child: Text("5th Item - Text in Card"),
-          ),
-          Text("Various kinds of widgets can be registered as items of ListView Widget"),
-        ],
+      body: ListView.builder(
+        itemBuilder: (context, index) {
+          String item = items[index];
+          return ListTile(
+            title: Text(item),
+          );
+        }
       ),
     );
-  }
-
-  void onPressedButton() {
-    scaffoldKey.currentState
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(content: Text("You pressed the button. Yay"))
-        );
   }
 }
