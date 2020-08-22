@@ -11,31 +11,51 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ListViewWithBuilder(title: 'ListView with builder'),
+      home: ListViewWithDiffTypeItems(title: 'ListView with different types of items'),
     );
   }
 }
 
-ListViewWithBuilderState pageState;
+abstract class ListsItem {}
 
-class ListViewWithBuilder extends StatefulWidget {
-  ListViewWithBuilder({Key key, this.title}) : super(key: key);
+class HeadingItem implements ListsItem {
+  final String heading;
+
+  HeadingItem(this.heading);
+}
+
+class MessageItem implements ListsItem {
+  final String sender;
+  final String body;
+
+  MessageItem(this.sender, this.body);
+}
+
+ListViewWithDiffTypeItemsState pageState;
+
+class ListViewWithDiffTypeItems extends StatefulWidget {
+  ListViewWithDiffTypeItems({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ListViewWithBuilderState createState() {
-    pageState = ListViewWithBuilderState();
+  ListViewWithDiffTypeItemsState createState() {
+    pageState = ListViewWithDiffTypeItemsState();
     return pageState;
   }
 }
 
-class ListViewWithBuilderState extends State<ListViewWithBuilder> {
-  List<String> items;
+class ListViewWithDiffTypeItemsState extends State<ListViewWithDiffTypeItems> {
+  List<ListsItem> items;
 
-  ListViewWithBuilderState() {
-    items = List<String>.generate(100, (index) {
-      return "Item - $index";
+  ListViewWithDiffTypeItemsState() {
+    items = List<ListsItem>.generate(100, (index) {
+      if (index % 5 == 0) {
+        return HeadingItem("HeadingItem $index");
+      }
+      else {
+        return MessageItem("Sender $index", "Message body $index");
+      }
     });
   }
 
@@ -44,12 +64,23 @@ class ListViewWithBuilderState extends State<ListViewWithBuilder> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: ListView.builder(
+        itemCount: items.length,
         itemBuilder: (context, index) {
-          String item = items[index];
-          return ListTile(
-            title: Text(item),
-          );
-        }
+          final item = items[index];
+          if (item is HeadingItem) {
+            return ListTile(title: Text(item.heading, style: TextStyle(fontWeight: FontWeight.bold)));
+          }
+          else if (item is MessageItem) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: ListTile(
+                title: Text(item.sender),
+                subtitle: Text(item.body),
+              ),
+            );
+          }
+          return null;
+        },
       ),
     );
   }
