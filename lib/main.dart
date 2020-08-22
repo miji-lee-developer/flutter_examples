@@ -11,51 +11,31 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ListViewWithDiffTypeItems(title: 'ListView with different types of items'),
+      home: ListViewHorizontal(title: 'ListView - Horizontal'),
     );
   }
 }
 
-abstract class ListsItem {}
+ListViewHorizontalState pageState;
 
-class HeadingItem implements ListsItem {
-  final String heading;
-
-  HeadingItem(this.heading);
-}
-
-class MessageItem implements ListsItem {
-  final String sender;
-  final String body;
-
-  MessageItem(this.sender, this.body);
-}
-
-ListViewWithDiffTypeItemsState pageState;
-
-class ListViewWithDiffTypeItems extends StatefulWidget {
-  ListViewWithDiffTypeItems({Key key, this.title}) : super(key: key);
+class ListViewHorizontal extends StatefulWidget {
+  ListViewHorizontal({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ListViewWithDiffTypeItemsState createState() {
-    pageState = ListViewWithDiffTypeItemsState();
+  ListViewHorizontalState createState() {
+    pageState = ListViewHorizontalState();
     return pageState;
   }
 }
 
-class ListViewWithDiffTypeItemsState extends State<ListViewWithDiffTypeItems> {
-  List<ListsItem> items;
+class ListViewHorizontalState extends State<ListViewHorizontal> {
+  List<Container> items;
 
-  ListViewWithDiffTypeItemsState() {
-    items = List<ListsItem>.generate(100, (index) {
-      if (index % 5 == 0) {
-        return HeadingItem("HeadingItem $index");
-      }
-      else {
-        return MessageItem("Sender $index", "Message body $index");
-      }
+  ListViewHorizontalState() {
+    items = List<Container>.generate(100, (index) {
+      return boxItem(index);
     });
   }
 
@@ -63,24 +43,32 @@ class ListViewWithDiffTypeItemsState extends State<ListViewWithDiffTypeItems> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
-      body: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          if (item is HeadingItem) {
-            return ListTile(title: Text(item.heading, style: TextStyle(fontWeight: FontWeight.bold)));
-          }
-          else if (item is MessageItem) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: ListTile(
-                title: Text(item.sender),
-                subtitle: Text(item.body),
-              ),
-            );
-          }
-          return null;
-        },
+      body: Container(
+        height: 100,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            return items[index];
+          },
+        ),
+      ),
+    );
+  }
+
+  boxItem(int index) {
+    return Container(
+      height: 100,
+      width: 100,
+      decoration: BoxDecoration(
+        color: (index % 3 == 0)
+            ? Colors.red
+            : (index % 3 == 1) ? Colors.blue : Colors.orange
+      ),
+      alignment: Alignment(0, 0),
+      child: Text(
+        "Item $index",
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
