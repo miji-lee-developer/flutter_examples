@@ -11,47 +11,35 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ListViewHorizontal(title: 'ListView - Horizontal'),
+      home: GridViewDemo(title: 'GridView Demo'),
     );
   }
 }
 
-ListViewHorizontalState pageState;
+GridViewDemoState pageState;
 
-class ListViewHorizontal extends StatefulWidget {
-  ListViewHorizontal({Key key, this.title}) : super(key: key);
+class GridViewDemo extends StatefulWidget {
+  GridViewDemo({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ListViewHorizontalState createState() {
-    pageState = ListViewHorizontalState();
+  GridViewDemoState createState() {
+    pageState = GridViewDemoState();
     return pageState;
   }
 }
 
-class ListViewHorizontalState extends State<ListViewHorizontal> {
-  List<Container> items;
-
-  ListViewHorizontalState() {
-    items = List<Container>.generate(100, (index) {
-      return boxItem(index);
-    });
-  }
-
+class GridViewDemoState extends State<GridViewDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
-      body: Container(
-        height: 100,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            return items[index];
-          },
-        ),
+      body: GridView.count(
+        crossAxisCount: 4,
+        children: List.generate(1000, (index) {
+          return boxItem(index);
+        }),
       ),
     );
   }
