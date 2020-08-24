@@ -11,52 +11,129 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: GridViewDemo(title: 'GridView Demo'),
+      home: ListViewHandleItem(title: 'ListView Handle Items'),
     );
   }
 }
 
-GridViewDemoState pageState;
+ListViewHandleItemState pageState;
 
-class GridViewDemo extends StatefulWidget {
-  GridViewDemo({Key key, this.title}) : super(key: key);
+class ListViewHandleItem extends StatefulWidget {
+  ListViewHandleItem({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  GridViewDemoState createState() {
-    pageState = GridViewDemoState();
+  ListViewHandleItemState createState() {
+    pageState = ListViewHandleItemState();
     return pageState;
   }
 }
 
-class GridViewDemoState extends State<GridViewDemo> {
+class ListViewHandleItemState extends State<ListViewHandleItem> {
+  List<String> items = List<String>.generate(7, (index) {
+   return "Item - $index";
+  });
+
+  final teController = TextEditingController(
+    text: "good",
+  );
+
+  @override
+  void dispose() {
+    teController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
-      body: GridView.count(
-        crossAxisCount: 4,
-        children: List.generate(1000, (index) {
-          return boxItem(index);
-        }),
-      ),
-    );
-  }
-
-  boxItem(int index) {
-    return Container(
-      height: 100,
-      width: 100,
-      decoration: BoxDecoration(
-        color: (index % 3 == 0)
-            ? Colors.red
-            : (index % 3 == 1) ? Colors.blue : Colors.orange
-      ),
-      alignment: Alignment(0, 0),
-      child: Text(
-        "Item $index",
-        style: TextStyle(color: Colors.white),
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              height: 70,
+              alignment: Alignment(0, 0),
+              color: Colors.orange,
+              child: Text(
+                "To remove an item, swipe the tile to the right or tap the trash icon.",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return Dismissible(
+                  key: Key(item),
+                  direction: DismissDirection.endToStart,
+                  child: ListTile(
+                    title: Text(item),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        setState(() {
+                          items.removeAt(index);
+                        });
+                      },
+                    ),
+                  ),
+                  onDismissed: (direction) {
+                    setState(() {
+                      items.removeAt(index);
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+          Divider(
+            color: Colors.grey,
+            height: 5,
+            indent: 10,
+            endIndent: 10,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Row(
+              children: <Widget>[
+                Text("Insert Data:"),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      controller: teController,
+                      onSubmitted: (text) {
+                        setState(() {
+                          if (teController.text != "") {
+                            items.add(teController.text);
+                          }
+                        });
+                        teController.clear();
+                      },
+                    ),
+                  ),
+                ),
+                RaisedButton(
+                  child: Text("Insert"),
+                  onPressed: () {
+                    setState(() {
+                      if (teController.text != "") {
+                        items.add(teController.text);
+                      }
+                    });
+                    teController.clear();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
