@@ -11,130 +11,136 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ListViewHandleItem(title: 'ListView Handle Items'),
+      home: ButtonWidget(title: 'Button Widget Demo'),
     );
   }
 }
 
-ListViewHandleItemState pageState;
+ButtonWidgetState pageState;
 
-class ListViewHandleItem extends StatefulWidget {
-  ListViewHandleItem({Key key, this.title}) : super(key: key);
+class ButtonWidget extends StatefulWidget {
+  ButtonWidget({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ListViewHandleItemState createState() {
-    pageState = ListViewHandleItemState();
+  ButtonWidgetState createState() {
+    pageState = ButtonWidgetState();
     return pageState;
   }
 }
 
-class ListViewHandleItemState extends State<ListViewHandleItem> {
-  List<String> items = List<String>.generate(7, (index) {
-   return "Item - $index";
-  });
-
-  final teController = TextEditingController(
-    text: "good",
-  );
+class ButtonWidgetState extends State<ButtonWidget> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  void dispose() {
-    teController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(title: Text(widget.title)),
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              height: 70,
-              alignment: Alignment(0, 0),
-              color: Colors.orange,
-              child: Text(
-                "To remove an item, swipe the tile to the right or tap the trash icon.",
-                style: TextStyle(color: Colors.white),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: ListView(
+          children: <Widget>[
+            Center(
+              child: FlatButton(
+                child: Text("FlatButton"),
+                onPressed: () {
+                  showSnackBar("FlatButton");
+                },
               ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return Dismissible(
-                  key: Key(item),
-                  direction: DismissDirection.endToStart,
-                  child: ListTile(
-                    title: Text(item),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        setState(() {
-                          items.removeAt(index);
-                        });
-                      },
-                    ),
-                  ),
-                  onDismissed: (direction) {
-                    setState(() {
-                      items.removeAt(index);
-                    });
-                  },
-                );
-              },
-            ),
-          ),
-          Divider(
-            color: Colors.grey,
-            height: 5,
-            indent: 10,
-            endIndent: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Row(
-              children: <Widget>[
-                Text("Insert Data:"),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: TextField(
-                      controller: teController,
-                      onSubmitted: (text) {
-                        setState(() {
-                          if (teController.text != "") {
-                            items.add(teController.text);
-                          }
-                        });
-                        teController.clear();
-                      },
-                    ),
-                  ),
+            Center(
+              child: FlatButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                disabledColor: Colors.grey,
+                disabledTextColor: Colors.black,
+                padding: EdgeInsets.all(8.0),
+                splashColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)
                 ),
-                RaisedButton(
-                  child: Text("Insert"),
+                child: Text("FlatButton with Color & Shape"),
+                onPressed: () {
+                  showSnackBar("FlatButton with Color & Shape");
+                },
+              ),
+            ),
+            Center(
+              child: OutlineButton(
+                color: Colors.purpleAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)
+                ),
+                child: Text("OutlineButton with Shape"),
+                onPressed: () {
+                  showSnackBar("OutlineButton with Shape");
+                },
+              ),
+            ),
+            Center(
+              child: RaisedButton(
+                child: Text("RaisedButton"),
+                onPressed: () {
+                  showSnackBar("RaisedButton");
+                },
+              ),
+            ),
+            Center(
+              child: RaisedButton(
+                color: Colors.orange,
+                textColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)
+                ),
+                child: Text("RaisedButton with Color"),
+                onPressed: () {
+                  showSnackBar("RaisedButton with Color");
+                },
+              ),
+            ),
+            Center(
+              child: IconButton(
+                color: Colors.redAccent,
+                icon: Icon(Icons.directions_bus),
+                onPressed: () {
+                  showSnackBar("IconButton");
+                },
+              ),
+            ),
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(0),
+                height: 40,
+                width: 40,
+                child: FloatingActionButton(
+                  child: Icon(Icons.add),
                   onPressed: () {
-                    setState(() {
-                      if (teController.text != "") {
-                        items.add(teController.text);
-                      }
-                    });
-                    teController.clear();
+                    showSnackBar("FloatingActionButton");
                   },
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  showSnackBar(String message) {
+    scaffoldKey.currentState
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: Colors.blue,
+            action: SnackBarAction(
+              label: "Done",
+              textColor: Colors.white,
+              onPressed: () {},
+            ),
+          ),
+        );
   }
 }
