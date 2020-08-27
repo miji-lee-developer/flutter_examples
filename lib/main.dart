@@ -11,120 +11,116 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ButtonWidget(title: 'Button Widget Demo'),
+      home: GestureDetectorDemo(title: 'GestureDetector & InkWell'),
     );
   }
 }
 
-ButtonWidgetState pageState;
+GestureDetectorDemoState pageState;
 
-class ButtonWidget extends StatefulWidget {
-  ButtonWidget({Key key, this.title}) : super(key: key);
+class GestureDetectorDemo extends StatefulWidget {
+  GestureDetectorDemo({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ButtonWidgetState createState() {
-    pageState = ButtonWidgetState();
+  GestureDetectorDemoState createState() {
+    pageState = GestureDetectorDemoState();
     return pageState;
   }
 }
 
-class ButtonWidgetState extends State<ButtonWidget> {
+class GestureDetectorDemoState extends State<GestureDetectorDemo> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(title: Text(widget.title)),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: ListView(
-          children: <Widget>[
-            Center(
-              child: FlatButton(
-                child: Text("FlatButton"),
-                onPressed: () {
-                  showSnackBar("FlatButton");
-                },
+      body: ListView(
+        children: <Widget>[
+          myTitle("InkWell"),
+          InkWell(
+            child: Container(
+              height: 50,
+              color: Colors.orange,
+              alignment: Alignment(0, 0),
+              margin: const EdgeInsets.all(10),
+              child: Text(
+                "Container with Text in InkWell\nTap me!!",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white),
               ),
             ),
-            Center(
-              child: FlatButton(
-                color: Colors.blue,
-                textColor: Colors.white,
-                disabledColor: Colors.grey,
-                disabledTextColor: Colors.black,
-                padding: EdgeInsets.all(8.0),
-                splashColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)
-                ),
-                child: Text("FlatButton with Color & Shape"),
-                onPressed: () {
-                  showSnackBar("FlatButton with Color & Shape");
-                },
+            onTap: () {
+              showSnackBar("InkWell - onTap");
+            },
+            onDoubleTap: () {
+              showSnackBar("InkWell - onDoubleTap");
+            },
+            onTapDown: (value) {
+              showSnackBar("InkWell - onTapDown");
+            },
+            onTapCancel: () {
+              showSnackBar("InkWell - onTapCancel");
+            },
+            onLongPress: () {
+              showSnackBar("InkWell - onLongPress");
+            },
+          ),
+          myTitle("Gesture Detector"),
+          GestureDetector(
+            child: Container(
+              height: 50,
+              color: Colors.blue,
+              alignment: Alignment(0, 0),
+              margin: const EdgeInsets.all(10),
+              child: Text(
+                "Container with Text in GestureDetector\nTap me!!",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white),
               ),
             ),
-            Center(
-              child: OutlineButton(
-                color: Colors.purpleAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)
-                ),
-                child: Text("OutlineButton with Shape"),
-                onPressed: () {
-                  showSnackBar("OutlineButton with Shape");
-                },
-              ),
-            ),
-            Center(
-              child: RaisedButton(
-                child: Text("RaisedButton"),
-                onPressed: () {
-                  showSnackBar("RaisedButton");
-                },
-              ),
-            ),
-            Center(
-              child: RaisedButton(
-                color: Colors.orange,
-                textColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)
-                ),
-                child: Text("RaisedButton with Color"),
-                onPressed: () {
-                  showSnackBar("RaisedButton with Color");
-                },
-              ),
-            ),
-            Center(
-              child: IconButton(
-                color: Colors.redAccent,
-                icon: Icon(Icons.directions_bus),
-                onPressed: () {
-                  showSnackBar("IconButton");
-                },
-              ),
-            ),
-            Center(
-              child: Container(
-                padding: const EdgeInsets.all(0),
-                height: 40,
-                width: 40,
-                child: FloatingActionButton(
-                  child: Icon(Icons.add),
-                  onPressed: () {
-                    showSnackBar("FloatingActionButton");
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
+            onTap: () {
+              showSnackBar("GestureDetector - onTap");
+            },
+            onDoubleTap: () {
+              showSnackBar("GestureDetector - onDoubleTap");
+            },
+            onTapDown: (value) {
+              showSnackBar("GestureDetector - onTapDown");
+            },
+            onTapCancel: () {
+              showSnackBar("GestureDetector - onTapCancel");
+            },
+            onLongPress: () {
+              showSnackBar("GestureDetector - onLongPress");
+            },
+          ),
+        ],
       ),
+    );
+  }
+
+  myTitle(String title) {
+    return Column(
+      children: <Widget>[
+        Container(
+          alignment: Alignment(-1, 0),
+          padding: const EdgeInsets.only(left: 10, top: 10, bottom: 5),
+          child: Text(
+            "* $title",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        Divider(
+          color: Colors.grey,
+          height: 0,
+          indent: 10,
+          endIndent: 10,
+        ),
+      ],
     );
   }
 
