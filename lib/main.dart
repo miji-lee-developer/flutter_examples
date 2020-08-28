@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,132 +12,133 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: GestureDetectorDemo(title: 'GestureDetector & InkWell'),
+      home: ScreenOrientationsDemo(title: 'AppBar'),
     );
   }
 }
 
-GestureDetectorDemoState pageState;
+ScreenOrientationsDemoState pageState;
 
-class GestureDetectorDemo extends StatefulWidget {
-  GestureDetectorDemo({Key key, this.title}) : super(key: key);
+class ScreenOrientationsDemo extends StatefulWidget {
+  ScreenOrientationsDemo({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  GestureDetectorDemoState createState() {
-    pageState = GestureDetectorDemoState();
+  ScreenOrientationsDemoState createState() {
+    pageState = ScreenOrientationsDemoState();
     return pageState;
   }
 }
 
-class GestureDetectorDemoState extends State<GestureDetectorDemo> {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-
+class ScreenOrientationsDemoState extends State<ScreenOrientationsDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
       appBar: AppBar(title: Text(widget.title)),
-      body: ListView(
-        children: <Widget>[
-          myTitle("InkWell"),
-          InkWell(
-            child: Container(
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: ListView(
+          children: <Widget> [
+            Container(
               height: 50,
               color: Colors.orange,
               alignment: Alignment(0, 0),
-              margin: const EdgeInsets.all(10),
+              margin: const EdgeInsets.only(bottom: 15),
               child: Text(
-                "Container with Text in InkWell\nTap me!!",
-                textAlign: TextAlign.center,
+                "Do this example on a real phone, not an emulator.",
                 style: TextStyle(color: Colors.white),
               ),
             ),
-            onTap: () {
-              showSnackBar("InkWell - onTap");
-            },
-            onDoubleTap: () {
-              showSnackBar("InkWell - onDoubleTap");
-            },
-            onTapDown: (value) {
-              showSnackBar("InkWell - onTapDown");
-            },
-            onTapCancel: () {
-              showSnackBar("InkWell - onTapCancel");
-            },
-            onLongPress: () {
-              showSnackBar("InkWell - onLongPress");
-            },
-          ),
-          myTitle("Gesture Detector"),
-          GestureDetector(
-            child: Container(
-              height: 50,
-              color: Colors.blue,
-              alignment: Alignment(0, 0),
-              margin: const EdgeInsets.all(10),
-              child: Text(
-                "Container with Text in GestureDetector\nTap me!!",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white),
+            Container(
+              width: 300,
+              child: RaisedButton(
+                child: Text("Set All (default)"),
+                onPressed: () {
+                  SystemChrome.setPreferredOrientations([
+                    DeviceOrientation.portraitUp,
+                    DeviceOrientation.portraitDown,
+                    DeviceOrientation.landscapeLeft,
+                    DeviceOrientation.landscapeRight,
+                  ]);
+                },
               ),
             ),
-            onTap: () {
-              showSnackBar("GestureDetector - onTap");
-            },
-            onDoubleTap: () {
-              showSnackBar("GestureDetector - onDoubleTap");
-            },
-            onTapDown: (value) {
-              showSnackBar("GestureDetector - onTapDown");
-            },
-            onTapCancel: () {
-              showSnackBar("GestureDetector - onTapCancel");
-            },
-            onLongPress: () {
-              showSnackBar("GestureDetector - onLongPress");
-            },
-          ),
-        ],
+            Divider(
+              height: 10,
+              color: Colors.grey,
+              indent: 70,
+              endIndent: 70,
+            ),
+            Container(
+              width: 300,
+              child: RaisedButton(
+                child: Text("DeviceOrientation.landscapes"),
+                onPressed: () {
+                  SystemChrome.setPreferredOrientations([
+                    DeviceOrientation.landscapeLeft,
+                    DeviceOrientation.landscapeRight,
+                  ]);
+                },
+              ),
+            ),
+            Container(
+              width: 300,
+              child: RaisedButton(
+                child: Text("DeviceOrientation.portraities"),
+                onPressed: () {
+                  SystemChrome.setPreferredOrientations([
+                    DeviceOrientation.portraitUp,
+                    DeviceOrientation.portraitDown,
+                  ]);
+                },
+              ),
+            ),
+            Divider(
+              height: 10,
+              color: Colors.grey,
+              indent: 70,
+              endIndent: 70,
+            ),
+            Container(
+              width: 300,
+              child: RaisedButton(
+                child: Text("DeviceOrientation.landscapeRight"),
+                onPressed: () {
+                  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight]);
+                },
+              ),
+            ),
+            Container(
+              width: 300,
+              child: RaisedButton(
+                child: Text("DeviceOrientation.landscapeLeft"),
+                onPressed: () {
+                  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                },
+              ),
+            ),
+            Container(
+              width: 300,
+              child: RaisedButton(
+                child: Text("DeviceOrientation.portraitUp"),
+                onPressed: () {
+                  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+                },
+              ),
+            ),
+            Container(
+              width: 300,
+              child: RaisedButton(
+                child: Text("DeviceOrientation.portraitDown"),
+                onPressed: () {
+                  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown]);
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
-  }
-
-  myTitle(String title) {
-    return Column(
-      children: <Widget>[
-        Container(
-          alignment: Alignment(-1, 0),
-          padding: const EdgeInsets.only(left: 10, top: 10, bottom: 5),
-          child: Text(
-            "* $title",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-        Divider(
-          color: Colors.grey,
-          height: 0,
-          indent: 10,
-          endIndent: 10,
-        ),
-      ],
-    );
-  }
-
-  showSnackBar(String message) {
-    scaffoldKey.currentState
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Colors.blue,
-            action: SnackBarAction(
-              label: "Done",
-              textColor: Colors.white,
-              onPressed: () {},
-            ),
-          ),
-        );
   }
 }
