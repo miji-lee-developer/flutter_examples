@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:admob_flutter/admob_flutter.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,133 +12,208 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ScreenOrientationsDemo(title: 'AppBar'),
+      home: AdmobFlutterPluginDemo(title: 'Admob Flutter Plugin Demo'),
     );
   }
 }
 
-ScreenOrientationsDemoState pageState;
+AdmobFlutterPluginDemoState pageState;
 
-class ScreenOrientationsDemo extends StatefulWidget {
-  ScreenOrientationsDemo({Key key, this.title}) : super(key: key);
+class AdmobFlutterPluginDemo extends StatefulWidget {
+  AdmobFlutterPluginDemo({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ScreenOrientationsDemoState createState() {
-    pageState = ScreenOrientationsDemoState();
+  AdmobFlutterPluginDemoState createState() {
+    pageState = AdmobFlutterPluginDemoState();
     return pageState;
   }
 }
 
-class ScreenOrientationsDemoState extends State<ScreenOrientationsDemo> {
+class AdmobFlutterPluginDemoState extends State<AdmobFlutterPluginDemo> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  AdmobBannerSize bannerSize = AdmobBannerSize.BANNER;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: ListView(
-          children: <Widget> [
+    /** Admob Plugin **/
+    Admob admob = AdmobManager.initAdmob();
+
+    return WillPopScope(
+      onWillPop: () async {
+        await _defaultWillPop();
+        return await Future.value(true);
+      },
+      child: Scaffold(
+        key: scaffoldKey,
+        appBar: _appBar(),
+        body: Column(
+          children: <Widget>[
             Container(
               height: 50,
-              color: Colors.orange,
-              alignment: Alignment(0, 0),
-              margin: const EdgeInsets.only(bottom: 15),
-              child: Text(
-                "Do this example on a real phone, not an emulator.",
-                style: TextStyle(color: Colors.white),
+              color: Colors.blueGrey,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget> [
+                  InkWell(
+                    child: Text(
+                      "BANNER",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        bannerSize = AdmobBannerSize.BANNER;
+                      });
+                    },
+                  ),
+                  InkWell(
+                    child: Text(
+                      "LARGE_BANNER",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        bannerSize = AdmobBannerSize.LARGE_BANNER;
+                      });
+                    },
+                  ),
+                  InkWell(
+                    child: Text(
+                      "MEDIUM_RECTANGLE",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        bannerSize = AdmobBannerSize.MEDIUM_RECTANGLE;
+                      });
+                    },
+                  ),
+                ],
               ),
             ),
-            Container(
-              width: 300,
-              child: RaisedButton(
-                child: Text("Set All (default)"),
-                onPressed: () {
-                  SystemChrome.setPreferredOrientations([
-                    DeviceOrientation.portraitUp,
-                    DeviceOrientation.portraitDown,
-                    DeviceOrientation.landscapeLeft,
-                    DeviceOrientation.landscapeRight,
-                  ]);
-                },
-              ),
-            ),
-            Divider(
-              height: 10,
-              color: Colors.grey,
-              indent: 70,
-              endIndent: 70,
-            ),
-            Container(
-              width: 300,
-              child: RaisedButton(
-                child: Text("DeviceOrientation.landscapes"),
-                onPressed: () {
-                  SystemChrome.setPreferredOrientations([
-                    DeviceOrientation.landscapeLeft,
-                    DeviceOrientation.landscapeRight,
-                  ]);
-                },
-              ),
-            ),
-            Container(
-              width: 300,
-              child: RaisedButton(
-                child: Text("DeviceOrientation.portraities"),
-                onPressed: () {
-                  SystemChrome.setPreferredOrientations([
-                    DeviceOrientation.portraitUp,
-                    DeviceOrientation.portraitDown,
-                  ]);
-                },
-              ),
-            ),
-            Divider(
-              height: 10,
-              color: Colors.grey,
-              indent: 70,
-              endIndent: 70,
-            ),
-            Container(
-              width: 300,
-              child: RaisedButton(
-                child: Text("DeviceOrientation.landscapeRight"),
-                onPressed: () {
-                  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight]);
-                },
-              ),
-            ),
-            Container(
-              width: 300,
-              child: RaisedButton(
-                child: Text("DeviceOrientation.landscapeLeft"),
-                onPressed: () {
-                  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-                },
-              ),
-            ),
-            Container(
-              width: 300,
-              child: RaisedButton(
-                child: Text("DeviceOrientation.portraitUp"),
-                onPressed: () {
-                  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-                },
-              ),
-            ),
-            Container(
-              width: 300,
-              child: RaisedButton(
-                child: Text("DeviceOrientation.portraitDown"),
-                onPressed: () {
-                  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown]);
+            Expanded(
+              child: ListView.builder(
+                itemCount: 50,
+                itemBuilder: (context, index) {
+                  if (index != 0 && index % 5 == 0) {
+                    return Column(
+                      children: <Widget>[
+                        Container(
+                          margin: const EdgeInsets.all(5),
+                          child: AdmobBanner(
+                            adUnitId: AdmobManager._isTest
+                                ? AdmobManager.test_banner_id
+                                : AdmobManager.banner_id,
+                            adSize: bannerSize,
+                          ),
+                        ),
+                        Container(
+                          height: 50,
+                          margin: const EdgeInsets.all(5),
+                          alignment: Alignment(0, 0),
+                          color: Colors.cyan,
+                          child: Text(
+                            "List Items - $index",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Container(
+                      height: 50,
+                      margin: const EdgeInsets.all(5),
+                      alignment: Alignment(0, 0),
+                      color: Colors.cyan,
+                      child: Text(
+                        "List Items - $index",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
                 },
               ),
             ),
           ],
         ),
+        bottomNavigationBar: (admob != null)
+          ? Container(
+              color: Colors.blueGrey,
+              child: AdmobManager.bottomBanner,
+            )
+          : null,
       ),
     );
   }
+
+  _appBar() {
+    return AppBar(
+      title: Text(widget.title),
+    );
+  }
+
+  _defaultWillPop() async {
+    var result = await showDialog(
+      context: scaffoldKey.currentContext,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titlePadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          title: Container(child: Text("Do you want to leave?"),),
+          contentPadding: const EdgeInsets.all(0),
+          content: Container(
+            margin: const EdgeInsets.all(0),
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(color: Colors.white),
+            child: AdmobManager.finishBanner,
+          ),
+          actions: <Widget> [
+            FlatButton(
+              child: Text("CANCEL"),
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+            ),
+            FlatButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    return result;
+  }
+}
+
+class AdmobManager {
+  static bool _isTest = true;
+
+  /** Test IDs **/
+  static String test_app_id = "ca-app-pub-3940256099942544~3347511713";
+  static String test_banner_id = "ca-app-pub-3940256099942544/6300978111";
+
+  /** You real IDs **/
+  static String app_id = "ca-app-pub-3940256099942544~3347511713";
+  static String banner_id = "ca-app-pub-3940256099942544/6300978111";
+
+  static Admob initAdmob() {
+    print("initAdmob");
+    return Admob.initialize(_isTest ? test_app_id : app_id);
+  }
+
+  static AdmobBanner bottomBanner = AdmobBanner(
+    adUnitId: _isTest ? test_banner_id : banner_id,
+    adSize: AdmobBannerSize.BANNER,
+  );
+
+  static AdmobBanner finishBanner = AdmobBanner(
+    adUnitId: _isTest ? test_banner_id : banner_id,
+    adSize: AdmobBannerSize.MEDIUM_RECTANGLE,
+  );
 }

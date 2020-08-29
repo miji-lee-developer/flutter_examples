@@ -24,6 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
   screen: ^0.0.5
+  admob_flutter: ^0.3.3
 
 
   # The following adds the Cupertino Icons font to your application.
