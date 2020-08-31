@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -11,26 +12,28 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: LoadImageFromAsset(title: 'Load Image From Asset'),
+      home: LoadImageFromNetwork(title: 'Load Image From Network'),
     );
   }
 }
 
-LoadImageFromAssetState pageState;
+LoadImageFromNetworkState pageState;
 
-class LoadImageFromAsset extends StatefulWidget {
-  LoadImageFromAsset({Key key, this.title}) : super(key: key);
+class LoadImageFromNetwork extends StatefulWidget {
+  LoadImageFromNetwork({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  LoadImageFromAssetState createState() {
-    pageState = LoadImageFromAssetState();
+  LoadImageFromNetworkState createState() {
+    pageState = LoadImageFromNetworkState();
     return pageState;
   }
 }
 
-class LoadImageFromAssetState extends State<LoadImageFromAsset> {
+class LoadImageFromNetworkState extends State<LoadImageFromNetwork> {
+  String url = "https://picsum.photos/300?${Random().nextInt(100)}";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,9 +43,18 @@ class LoadImageFromAssetState extends State<LoadImageFromAsset> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Center(
-            child: Image.asset("assets/images/download.jpg"),
+            child: Image.network(url),
           ),
-          Text("path: assets/images/download.jpg"),
+          Text(url),
+          Container(
+            decoration: BoxDecoration(color: Colors.orangeAccent),
+            margin: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(15),
+            child: Text(
+              "* Loading a network image takes time to download the image data.",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
         ],
       ),
     );
