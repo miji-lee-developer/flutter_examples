@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,38 +13,55 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: LoadImageFromNetwork(title: 'Load Image From Network'),
+      home: LoadFadeInImageFromNetwork(title: 'Load Image From Network'),
     );
   }
 }
 
-LoadImageFromNetworkState pageState;
+LoadFadeInImageFromNetworkState pageState;
 
-class LoadImageFromNetwork extends StatefulWidget {
-  LoadImageFromNetwork({Key key, this.title}) : super(key: key);
+class LoadFadeInImageFromNetwork extends StatefulWidget {
+  LoadFadeInImageFromNetwork({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  LoadImageFromNetworkState createState() {
-    pageState = LoadImageFromNetworkState();
+  LoadFadeInImageFromNetworkState createState() {
+    pageState = LoadFadeInImageFromNetworkState();
     return pageState;
   }
 }
 
-class LoadImageFromNetworkState extends State<LoadImageFromNetwork> {
+class LoadFadeInImageFromNetworkState extends State<LoadFadeInImageFromNetwork> {
   String url = "https://picsum.photos/300?${Random().nextInt(100)}";
+
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(title: Text(widget.title)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Center(
-            child: Image.network(url),
+          Container(
+            height: 300,
+            child: Stack(
+              alignment: Alignment(0, 0),
+              children: <Widget>[
+                Center(
+                  child: CircularProgressIndicator(),
+                ),
+                Center(
+                  child: FadeInImage.memoryNetwork(
+                    placeholder: kTransparentImage,
+                    image: url,
+                  ),
+                ),
+              ],
+            ),
           ),
           Text(url),
           Container(
@@ -55,8 +73,30 @@ class LoadImageFromNetworkState extends State<LoadImageFromNetwork> {
               style: TextStyle(color: Colors.white),
             ),
           ),
+          Container(
+            margin: const EdgeInsets.all(5),
+            padding: const EdgeInsets.only(top: 3, right: 15),
+            alignment: Alignment.bottomRight,
+            child: Container(
+              padding: const EdgeInsets.all(0),
+              height: 40,
+              width: 40,
+              child: FloatingActionButton(
+                child: Icon(Icons.refresh),
+                onPressed: () {
+                  setState(() {
+                    getImage();
+                  });
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  getImage() {
+    url = "https://picsum.photos/300?${Random().nextInt(100)}";
   }
 }
