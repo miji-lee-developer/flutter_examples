@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,74 +13,221 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: LoadImageFromGallery(title: 'Load Image From Gallery'),
+      home: FileReadWriteDemo(title: 'File I/O'),
     );
   }
 }
 
-LoadImageFromGalleryState pageState;
+FileReadWriteDemoState pageState;
 
-class LoadImageFromGallery extends StatefulWidget {
-  LoadImageFromGallery({Key key, this.title}) : super(key: key);
+class FileReadWriteDemo extends StatefulWidget {
+  FileReadWriteDemo({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  LoadImageFromGalleryState createState() {
-    pageState = LoadImageFromGalleryState();
+  FileReadWriteDemoState createState() {
+    pageState = FileReadWriteDemoState();
     return pageState;
   }
 }
 
-class LoadImageFromGalleryState extends State<LoadImageFromGallery> {
-  File _image;
+class FileReadWriteDemoState extends State<FileReadWriteDemo> {
+  String appDocPath;
+  String filePath;
+  TextEditingController wCon = TextEditingController();
+  TextEditingController rCon = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    prepareDirPath();
+  }
+
+  void prepareDirPath() async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    Stream<FileSystemEntity> files = appDocDir.list();
+
+    files.listen((data) {
+      print("Data: " + data.toString());
+    });
+
+    setState(() {
+      appDocPath = appDocDir.path;
+      filePath = "$appDocPath/text.txt";
+    });
+  }
+
+  Future<File> getFileRef() async {
+    return File(filePath);
+  }
+
+  writeFile() async {
+    File file = await getFileRef();
+    file.writeAsString(wCon.text);
+    wCon.clear();
+  }
+
+  readFile() async {
+    File file = await getFileRef();
+    String text = await file.readAsString();
+    rCon.text = text;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            Container(
-              margin: const EdgeInsets.all(10),
-              width: 300,
-              height: 300,
-              child: (_image != null) ? Image.file(_image) : Placeholder(),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                RaisedButton(
-                  color: Colors.blue,
-                  textColor: Colors.white,
-                  child: Text("Gallery"),
-                  onPressed: () {
-                    getImage(ImageSource.gallery);
-                  },
-                ),
-                RaisedButton(
-                  color: Colors.orange,
-                  textColor: Colors.white,
-                  child: Text("Camera"),
-                  onPressed: () {
-                    getImage(ImageSource.camera);
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              prepareDirPath();
+            },
+          ),
+        ],
+      ),
+      body: ListView(
+        children: <Widget>[
+          showPathInfo(), writeFileArea(), readFileArea()
+        ],
       ),
     );
   }
 
-  void getImage(ImageSource source) async {
-    print("getImageFromGallery");
-    var image = await ImagePicker.pickImage(source: source);
+  Widget showPathInfo() {
+    return Container(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        children: <Widget>[
+          ListTile(
+            title: Text("Documents directory's path"),
+            subtitle: (appDocPath != null) ? Text(appDocPath) : null,
+          ),
+          ListTile(
+            title: Text("File name & path"),
+            subtitle: (filePath != null) ? Text(filePath) : null,
+          ),
+        ],
+      ),
+    );
+  }
 
-    setState(() {
-      _image = image;
-    });
+  writeFileArea() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                child: Text(
+                  "* Write File (text.txt)",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                alignment: Alignment(-1, 0),
+              ),
+              SizedBox(
+                height: 30,
+                child: RaisedButton(
+                  color: Colors.orangeAccent,
+                  textColor: Colors.white,
+                  child: Text("Write"),
+                  onPressed: () {
+                    writeFile();
+                  },
+                ),
+              ),
+            ],
+          ),
+          Divider(color: Colors.grey),
+          TextField(
+            controller: wCon,
+            maxLines: 5,
+            decoration: InputDecoration(
+              hintText: "Insert text that you want to write to file",
+              filled: true,
+              fillColor: Colors.white70,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(color: Colors.blueAccent),
+              ),
+            ),
+          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(top: 10),
+          //   child: SizedBox(
+          //     height: 30,
+          //     child: RaisedButton(
+          //       color: Colors.orangeAccent,
+          //       textColor: Colors.white,
+          //       child: Text("Write"),
+          //       onPressed: () {
+          //         writeFile();
+          //       },
+          //     ),
+          //   ),
+          // ),
+        ],
+      ),
+    );
+  }
+
+  readFileArea() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.only(top: 50, bottom: 20),
+      child: Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                child: Text(
+                  "* Read File (text.txt)",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                alignment: Alignment(-1, 0),
+              ),
+              SizedBox(
+                height: 30,
+                child: RaisedButton(
+                  color: Colors.orangeAccent,
+                  textColor: Colors.white,
+                  child: Text("Read"),
+                  onPressed: () {
+                    readFile();
+                  },
+                ),
+              ),
+            ],
+          ),
+          Divider(color: Colors.grey,),
+          TextField(
+            controller: rCon,
+            maxLines: 5,
+            readOnly: true,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Color(0xFFDBEDFF),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
