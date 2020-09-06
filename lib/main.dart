@@ -1,6 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,220 +12,123 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: FileReadWriteDemo(title: 'File I/O'),
+      home: ReadAssetFile(title: 'Read Asset File'),
     );
   }
 }
 
-FileReadWriteDemoState pageState;
+ReadAssetFileState pageState;
 
-class FileReadWriteDemo extends StatefulWidget {
-  FileReadWriteDemo({Key key, this.title}) : super(key: key);
+class ReadAssetFile extends StatefulWidget {
+  ReadAssetFile({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  FileReadWriteDemoState createState() {
-    pageState = FileReadWriteDemoState();
+  ReadAssetFileState createState() {
+    pageState = ReadAssetFileState();
     return pageState;
   }
 }
 
-class FileReadWriteDemoState extends State<FileReadWriteDemo> {
-  String appDocPath;
-  String filePath;
-  TextEditingController wCon = TextEditingController();
-  TextEditingController rCon = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    prepareDirPath();
-  }
-
-  void prepareDirPath() async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    Stream<FileSystemEntity> files = appDocDir.list();
-
-    files.listen((data) {
-      print("Data: " + data.toString());
-    });
-
-    setState(() {
-      appDocPath = appDocDir.path;
-      filePath = "$appDocPath/text.txt";
-    });
-  }
-
-  Future<File> getFileRef() async {
-    return File(filePath);
-  }
-
-  writeFile() async {
-    File file = await getFileRef();
-    file.writeAsString(wCon.text);
-    wCon.clear();
-  }
+class ReadAssetFileState extends State<ReadAssetFile> {
+  String filePath = "assets/files/albums.json";
+  String fileText = "";
 
   readFile() async {
-    File file = await getFileRef();
-    String text = await file.readAsString();
-    rCon.text = text;
+    String text = await rootBundle.loadString(filePath);
+    setState(() {
+      fileText = text;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              prepareDirPath();
-            },
-          ),
-        ],
-      ),
-      body: ListView(
+      appBar: AppBar(title: Text(widget.title)),
+      body: Column(
         children: <Widget>[
-          showPathInfo(), writeFileArea(), readFileArea()
-        ],
-      ),
-    );
-  }
-
-  Widget showPathInfo() {
-    return Container(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Column(
-        children: <Widget>[
-          ListTile(
-            title: Text("Documents directory's path"),
-            subtitle: (appDocPath != null) ? Text(appDocPath) : null,
-          ),
-          ListTile(
-            title: Text("File name & path"),
-            subtitle: (filePath != null) ? Text(filePath) : null,
-          ),
-        ],
-      ),
-    );
-  }
-
-  writeFileArea() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                child: Text(
-                  "* Write File (text.txt)",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Row(
+              children: <Widget>[
+                Text("File Info: "),
+                Container(width: 10),
+                Expanded(child: customTextContainer(filePath)),
+                Container(width: 10),
+                customButton("Read", () { readFile(); }),
+                Container(
+                  padding: const EdgeInsets.only(left: 5, top: 5, bottom: 5),
+                  height: 40,
+                  width: 35,
+                  child: RaisedButton(
+                    padding: const EdgeInsets.all(0),
+                    color: Colors.blue,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    child: Icon(
+                      Icons.refresh,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        fileText = "";
+                      });
+                    },
+                  ),
                 ),
-                alignment: Alignment(-1, 0),
-              ),
-              SizedBox(
-                height: 30,
-                child: RaisedButton(
-                  color: Colors.orangeAccent,
-                  textColor: Colors.white,
-                  child: Text("Write"),
-                  onPressed: () {
-                    writeFile();
-                  },
-                ),
-              ),
-            ],
-          ),
-          Divider(color: Colors.grey),
-          TextField(
-            controller: wCon,
-            maxLines: 5,
-            decoration: InputDecoration(
-              hintText: "Insert text that you want to write to file",
-              filled: true,
-              fillColor: Colors.white70,
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide(color: Colors.grey),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide(color: Colors.blueAccent),
-              ),
+              ],
             ),
           ),
-          // Padding(
-          //   padding: const EdgeInsets.only(top: 10),
-          //   child: SizedBox(
-          //     height: 30,
-          //     child: RaisedButton(
-          //       color: Colors.orangeAccent,
-          //       textColor: Colors.white,
-          //       child: Text("Write"),
-          //       onPressed: () {
-          //         writeFile();
-          //       },
-          //     ),
-          //   ),
-          // ),
-        ],
-      ),
-    );
-  }
-
-  readFileArea() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      padding: const EdgeInsets.only(top: 50, bottom: 20),
-      child: Column(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                child: Text(
-                  "* Read File (text.txt)",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                border: Border.all(color: Colors.grey, width: 1),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Text(
+                    fileText,
+                    style: TextStyle(fontSize: 13),
+                  ),
                 ),
-                alignment: Alignment(-1, 0),
-              ),
-              SizedBox(
-                height: 30,
-                child: RaisedButton(
-                  color: Colors.orangeAccent,
-                  textColor: Colors.white,
-                  child: Text("Read"),
-                  onPressed: () {
-                    readFile();
-                  },
-                ),
-              ),
-            ],
-          ),
-          Divider(color: Colors.grey,),
-          TextField(
-            controller: rCon,
-            maxLines: 5,
-            readOnly: true,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Color(0xFFDBEDFF),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide(color: Colors.grey),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide(color: Colors.grey),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  customTextContainer(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Text(text)
+    );
+  }
+
+  customButton(String text, Null Function() onPressed) {
+    return SizedBox(
+      height: 30,
+      width: 60,
+      child: FlatButton(
+        padding: const EdgeInsets.all(0),
+        color: Colors.blue,
+        textColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 13),
+        ),
+        onPressed: onPressed,
       ),
     );
   }

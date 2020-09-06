@@ -66,6 +66,7 @@ flutter:
     - assets/images/200by300.jpg
     - assets/images/300by200.jpg
     - assets/images/300by300.jpg
+    - assets/files/albums.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
