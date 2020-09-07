@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -12,35 +13,29 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ReadAssetFile(title: 'Read Asset File'),
+      home: ParseJsonDemo(title: 'Parse Json Data'),
     );
   }
 }
 
-ReadAssetFileState pageState;
+ParseJsonDemoState pageState;
 
-class ReadAssetFile extends StatefulWidget {
-  ReadAssetFile({Key key, this.title}) : super(key: key);
+class ParseJsonDemo extends StatefulWidget {
+  ParseJsonDemo({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ReadAssetFileState createState() {
-    pageState = ReadAssetFileState();
+  ParseJsonDemoState createState() {
+    pageState = ParseJsonDemoState();
     return pageState;
   }
 }
 
-class ReadAssetFileState extends State<ReadAssetFile> {
-  String filePath = "assets/files/albums.json";
-  String fileText = "";
-
-  readFile() async {
-    String text = await rootBundle.loadString(filePath);
-    setState(() {
-      fileText = text;
-    });
-  }
+class ParseJsonDemoState extends State<ParseJsonDemo> {
+  String filePath = "assets/files/albums.json"; // Json File
+  String fileText = ""; // String to store Json Data
+  List<Album> albums = List<Album>(); // List to store Parsed Json Data
 
   @override
   Widget build(BuildContext context) {
@@ -57,49 +52,132 @@ class ReadAssetFileState extends State<ReadAssetFile> {
                 Expanded(child: customTextContainer(filePath)),
                 Container(width: 10),
                 customButton("Read", () { readFile(); }),
-                Container(
-                  padding: const EdgeInsets.only(left: 5, top: 5, bottom: 5),
-                  height: 40,
-                  width: 35,
-                  child: RaisedButton(
-                    padding: const EdgeInsets.all(0),
-                    color: Colors.blue,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    child: Icon(
-                      Icons.refresh,
-                      size: 20,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        fileText = "";
-                      });
-                    },
-                  ),
+              ],
+            ),
+          ),
+          Container(
+            height: 200,
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              border: Border.all(color: Colors.grey, width: 1),
+            ),
+            child: Center(
+              child: SingleChildScrollView(
+                child: Text(
+                  fileText,
+                  style: TextStyle(fontSize: 13),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text("Parse Json File String to Albums"),
+                customButton(
+                  "parse",
+                  (fileText.length > 0)
+                  ? () { parseJson(); }
+                  : null
                 ),
               ],
             ),
           ),
           Expanded(
             child: Container(
-              margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
               decoration: BoxDecoration(
                 color: Colors.grey[200],
                 border: Border.all(color: Colors.grey, width: 1),
-                borderRadius: BorderRadius.circular(5),
               ),
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Text(
-                    fileText,
-                    style: TextStyle(fontSize: 13),
-                  ),
-                ),
+              child: ListView.builder(
+                itemCount: albums.length,
+                itemBuilder: (Context, index) {
+                  Album album = albums[index];
+                  return Card(
+                    child: Container(
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            height: 30,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                customBoxContainer(Text("userID: "), left: true, top: true, right: true),
+                                customBoxContainer(Text(album.userId.toString()), top: true, right: true),
+                                customBoxContainer(Text("id: "), top: true, right: true),
+                                customBoxContainer(Text(album.id.toString()), top: true, right: true),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            height: 50,
+                            child: Row(
+                              children: <Widget>[
+                                customBoxContainer(Text("title: "), left: true, top: true, bottom: true),
+                                customBoxContainer(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    album.title,
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ),
+                                left: true, top: true, right: true, bottom: true, flex: 4)
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  readFile() async {
+    String text = await rootBundle.loadString(filePath);
+    setState(() {
+      fileText = text;
+    });
+  }
+
+  parseJson() {
+    final parsed = json.decode(fileText).cast<Map<String, dynamic>>();
+    setState(() {
+      albums = parsed.map<Album>((json) => Album.fromJson(json)).toList();
+    });
+  }
+
+  customBoxContainer(Widget child,
+      {bool left = false,
+        bool top = false,
+        bool right = false,
+        bool bottom = false,
+        int flex = 1}) {
+    BorderSide borderSide = BorderSide(color: Colors.grey[500], width: 1);
+    return Expanded(
+      flex: flex,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            left: (left == true) ? borderSide : BorderSide.none,
+            top: (top == true) ? borderSide : BorderSide.none,
+            right: (right == true) ? borderSide : BorderSide.none,
+            bottom: (bottom == true) ? borderSide : BorderSide.none,
+          ),
+        ),
+        alignment: Alignment(0, 0),
+        child: child,
       ),
     );
   }
@@ -111,7 +189,7 @@ class ReadAssetFileState extends State<ReadAssetFile> {
         border: Border.all(color: Colors.grey, width: 1),
         borderRadius: BorderRadius.circular(5),
       ),
-      child: Text(text)
+      child: Text(text),
     );
   }
 
@@ -122,6 +200,7 @@ class ReadAssetFileState extends State<ReadAssetFile> {
       child: FlatButton(
         padding: const EdgeInsets.all(0),
         color: Colors.blue,
+        disabledColor: Colors.grey,
         textColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Text(
@@ -130,6 +209,22 @@ class ReadAssetFileState extends State<ReadAssetFile> {
         ),
         onPressed: onPressed,
       ),
+    );
+  }
+}
+
+class Album {
+  final int userId;
+  final int id;
+  final String title;
+
+  Album({this.userId, this.id, this.title});
+
+  factory Album.fromJson(Map<String, dynamic> json) {
+    return Album(
+      userId: json['userId'] as int,
+      id: json['id'] as int,
+      title: json['title'] as String
     );
   }
 }
