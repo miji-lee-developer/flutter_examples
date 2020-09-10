@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_share/flutter_share.dart';
-import 'package:package_info/package_info.dart';
+import 'package:app_review/app_review.dart';
+import 'package:rating_dialog/rating_dialog.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,50 +13,39 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ShareAppDemo(title: 'Share App Demo'),
+      home: ReviewAppDemo(title: 'Request App Review Demo'),
     );
   }
 }
 
-ShareAppDemoState pageState;
+ReviewAppDemoState pageState;
 
-class ShareAppDemo extends StatefulWidget {
-  ShareAppDemo({Key key, this.title}) : super(key: key);
+class ReviewAppDemo extends StatefulWidget {
+  ReviewAppDemo({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ShareAppDemoState createState() {
-    pageState = ShareAppDemoState();
+  ReviewAppDemoState createState() {
+    pageState = ReviewAppDemoState();
     return pageState;
   }
 }
 
-class ShareAppDemoState extends State<ShareAppDemo> {
-  String appName;
-  String appID;
+class ReviewAppDemoState extends State<ReviewAppDemo> {
+  String appID = "";
+  String output = "";
 
   @override
-  void initState() {
+  initState() {
     super.initState();
-    prepareInfo();
-  }
 
-  void prepareInfo() async {
-    PackageInfo pInfo = await PackageInfo.fromPlatform();
-    setState(() {
-      appName = pInfo.appName;
-      appID = pInfo.packageName;
+    AppReview.getAppID.then((onValue) {
+      setState(() {
+        appID = onValue;
+      });
+      print("App ID: " + appID);
     });
-  }
-
-  Future<void> shareApp() async {
-    await FlutterShare.share(
-      chooserTitle: "Share $appName",
-      title: appName,
-      text: "Introducing the Flutter Code Examples app.",
-      linkUrl: 'https://play.google.com/store/apps/details?id=$appID',
-    );
   }
 
   @override
@@ -67,13 +56,7 @@ class ShareAppDemoState extends State<ShareAppDemo> {
         children: <Widget>[
           Card(
             child: ListTile(
-              title: Text("App Name"),
-              subtitle: Text(appName),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: Text("Package Name (AppID)"),
+              title: Text("App ID"),
               subtitle: Text(appID),
             ),
           ),
@@ -82,16 +65,47 @@ class ShareAppDemoState extends State<ShareAppDemo> {
               child: RaisedButton.icon(
                 color: Colors.blueAccent,
                 textColor: Colors.white,
-                icon: Icon(Icons.share),
-                label: Text("Share App"),
+                icon: Icon(Icons.star),
+                label: Text("Review App"),
                 onPressed: () {
-                  shareApp();
+                  rateApp();
                 },
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  void rateApp() {
+    showDialog(
+      context: context,
+      barrierDismissible: true, // set to false if you want to force a rating
+      builder: (context) {
+        return RatingDialog(
+          icon: const FlutterLogo(size: 100, colors: Colors.blue),
+          // set your own image/icon widget
+          title: "The Rating Dialog",
+          description: "Tap a star to set your rating. Add more description here if you want.",
+          submitButton: "SUBMIT",
+          alternativeButton: "Contact us instead?",
+          // optional
+          positiveComment: "We are so happy to hear :)",
+          // optional
+          negativeComment: "We're sad to hear :(",
+          // optional
+          accentColor: Colors.blue,
+          // optional
+          onSubmitPressed: (int rating) {
+            print("onSubmitPressed: rating = $rating");
+            AppReview.writeReview;
+          },
+          onAlternativePressed: () {
+            print("onAlternativePressed: do something");
+          },
+        );
+      },
     );
   }
 }
