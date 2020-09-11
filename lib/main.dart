@@ -111,6 +111,7 @@ class VolumeDemoState extends State<VolumeDemo> {
                   print(am.toString());
                   initPlatformState(am);
                   updateVolumes();
+                  audioManager = am;
                 },
               ),
               (currentVol != null || maxVol != null)
