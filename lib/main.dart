@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:app_review/app_review.dart';
-import 'package:rating_dialog/rating_dialog.dart';
+import 'dart:async';
+import 'package:volume/volume.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,99 +13,122 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ReviewAppDemo(title: 'Request App Review Demo'),
+      home: VolumeDemo(title: 'Volume Plugin example app'),
     );
   }
 }
 
-ReviewAppDemoState pageState;
+VolumeDemoState pageState;
 
-class ReviewAppDemo extends StatefulWidget {
-  ReviewAppDemo({Key key, this.title}) : super(key: key);
+class VolumeDemo extends StatefulWidget {
+  VolumeDemo({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ReviewAppDemoState createState() {
-    pageState = ReviewAppDemoState();
+  VolumeDemoState createState() {
+    pageState = VolumeDemoState();
     return pageState;
   }
 }
 
-class ReviewAppDemoState extends State<ReviewAppDemo> {
-  String appID = "";
-  String output = "";
+class VolumeDemoState extends State<VolumeDemo> {
+  AudioManager audioManager;
+  int maxVol, currentVol;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
+    audioManager = AudioManager.STREAM_SYSTEM;
+    initPlatformState(AudioManager.STREAM_VOICE_CALL);
+    updateVolumes();
+  }
 
-    AppReview.getAppID.then((onValue) {
-      setState(() {
-        appID = onValue;
-      });
-      print("App ID: " + appID);
-    });
+  Future<void> initPlatformState(AudioManager am) async {
+    await Volume.controlVolume(am);
+  }
+
+  void updateVolumes() async {
+    maxVol = await Volume.getMaxVol;
+    currentVol = await Volume.getVol;
+    print("maxVol: $maxVol, currentVol: $currentVol");
+    setState(() {});
+  }
+
+  void setVol(int i) async {
+    await Volume.setVol(i);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
-      body: Column(
-        children: <Widget>[
-          Card(
-            child: ListTile(
-              title: Text("App ID"),
-              subtitle: Text(appID),
-            ),
-          ),
-          Expanded(
-            child: Center(
-              child: RaisedButton.icon(
-                color: Colors.blueAccent,
-                textColor: Colors.white,
-                icon: Icon(Icons.star),
-                label: Text("Review App"),
-                onPressed: () {
-                  rateApp();
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: Text(widget.title)),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Text("Max Volume: $maxVol"),
+                    Text("Current Volume: $currentVol"),
+                  ],
+                ),
+              ),
+              DropdownButton(
+                value: audioManager,
+                items: [
+                  DropdownMenuItem(
+                    child: Text("In Call Volume"),
+                    value: AudioManager.STREAM_VOICE_CALL,
+                  ),
+                  DropdownMenuItem(
+                    child: Text("System Volume"),
+                    value: AudioManager.STREAM_SYSTEM,
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Ring Volume"),
+                    value: AudioManager.STREAM_RING,
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Media Volume"),
+                    value: AudioManager.STREAM_MUSIC,
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Alarm Volume"),
+                    value: AudioManager.STREAM_ALARM,
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Notifications Volume"),
+                    value: AudioManager.STREAM_NOTIFICATION,
+                  ),
+                ],
+                isDense: true,
+                onChanged: (AudioManager am) async {
+                  print(am.toString());
+                  initPlatformState(am);
+                  updateVolumes();
                 },
               ),
-            ),
+              (currentVol != null || maxVol != null)
+              ? Slider(
+                value: currentVol / 1.0,
+                divisions: maxVol,
+                max: maxVol / 1.0,
+                min: 0,
+                onChanged: (double d) {
+                  setVol(d.toInt());
+                  updateVolumes();
+                },
+              )
+              : Container(),
+            ],
           ),
-        ],
+        ),
       ),
-    );
-  }
-
-  void rateApp() {
-    showDialog(
-      context: context,
-      barrierDismissible: true, // set to false if you want to force a rating
-      builder: (context) {
-        return RatingDialog(
-          icon: const FlutterLogo(size: 100, colors: Colors.blue),
-          // set your own image/icon widget
-          title: "The Rating Dialog",
-          description: "Tap a star to set your rating. Add more description here if you want.",
-          submitButton: "SUBMIT",
-          alternativeButton: "Contact us instead?",
-          // optional
-          positiveComment: "We are so happy to hear :)",
-          // optional
-          negativeComment: "We're sad to hear :(",
-          // optional
-          accentColor: Colors.blue,
-          // optional
-          onSubmitPressed: (int rating) {
-            print("onSubmitPressed: rating = $rating");
-            AppReview.writeReview;
-          },
-          onAlternativePressed: () {
-            print("onAlternativePressed: do something");
-          },
-        );
-      },
     );
   }
 }
