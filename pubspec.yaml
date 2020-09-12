@@ -34,6 +34,8 @@ dependencies:
   app_review: ^1.0.0
   rating_dialog: ^1.0.0
   volume: ^0.1.0
+  sqflite: ^1.1.7+1
+  faker: ^1.1.1 # provide fake & random user info
 
 
   # The following adds the Cupertino Icons font to your application.
