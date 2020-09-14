@@ -107,24 +107,24 @@ class HttpGetDemoState extends State<HttpGetDemo> {
                       },
                     ),
                   ),
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        border: Border.all(color: Colors.grey, width: 1),
-                      ),
-                      child: Center(
-                        child: (response == null)
-                            ? CircularProgressIndicator()
-                            : SingleChildScrollView(
-                              child: Text(response, style: TextStyle(fontSize: 13))
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
+              ),
+            ),
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  border: Border.all(color: Colors.grey, width: 1),
+                ),
+                child: Center(
+                  child: (response == null)
+                      ? CircularProgressIndicator()
+                      : SingleChildScrollView(
+                      child: Text(response, style: TextStyle(fontSize: 13))
+                  ),
+                ),
               ),
             ),
           ],
