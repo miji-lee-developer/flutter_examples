@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:http/http.dart' as http;
 
 void main() => runApp(MyApp());
 
@@ -13,169 +11,177 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HttpGetDemo(title: 'Http Get Request'),
+      home: ListViewHandleItem2(title: 'ListView Handle Items2'),
     );
   }
 }
 
-HttpGetDemoState pageState;
+ListViewHandleItem2State pageState;
 
-class HttpGetDemo extends StatefulWidget {
-  HttpGetDemo({Key key, this.title}) : super(key: key);
+class ListViewHandleItem2 extends StatefulWidget {
+  ListViewHandleItem2({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  HttpGetDemoState createState() {
-    pageState = HttpGetDemoState();
+  ListViewHandleItem2State createState() {
+    pageState = ListViewHandleItem2State();
     return pageState;
   }
 }
 
-class HttpGetDemoState extends State<HttpGetDemo> {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
+class ListViewHandleItem2State extends State<ListViewHandleItem2> {
+  List<String> items = List<String>.generate(7, (index) {
+    return "Item - $index";
+  });
 
-  TextEditingController teCon = TextEditingController(text: "https://jsonplaceholder.typicode.com/albums");
-  FocusNode myFocusNode = FocusNode();
-  String response = "";
-  TextStyle ts = TextStyle(fontSize: 12);
+  TextEditingController insertCon = TextEditingController(
+    text: "good",
+  );
+  TextEditingController changeCon = TextEditingController();
+
+  int selectedIndex;
 
   @override
   void dispose() {
+    insertCon.dispose();
+    changeCon.dispose();
     super.dispose();
-    myFocusNode.dispose();
-    teCon.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
       appBar: AppBar(title: Text(widget.title)),
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                customButton("albums", "https://jsonplaceholder.typicode.com/albums"),
-                customButton("comments", "https://jsonplaceholder.typicode.com/comments"),
-                customButton("Google", "https://google.com"),
-                customButton("Flutter", "https://flutter.dev"),
-                customButton("Facebook", "https://facebook.com"),
-              ],
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              height: 70,
+              alignment: Alignment(0, 0),
+              color: Colors.orange,
+              child: Text(
+                "To remove an item, swipe the tile to the right or tap the trash icon.",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text("URL: ", style: ts),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: TextField(
-                        style: TextStyle(fontSize: 10),
-                        decoration: InputDecoration(),
-                        controller: teCon,
-                        focusNode: myFocusNode,
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return  Dismissible(
+                  key: Key(item),
+                  direction: DismissDirection.startToEnd,
+                  child: InkWell(
+                    child: ListTile(
+                      title: Text(item),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete_forever),
+                        onPressed: () {
+                          setState(() {
+                            items.removeAt(index);
+                          });
+                        },
                       ),
                     ),
+                    onTap: () {
+                      selectedIndex = index;
+                      changeCon.text = items[index];
+                    },
                   ),
-                  Container(
-                    width: 50,
-                    child: RaisedButton(
-                      padding: const EdgeInsets.all(0),
-                      color: Colors.blueGrey,
-                      textColor: Colors.white,
-                      child: Text("GET", style: ts),
-                      onPressed: () {
-                        _getUrl(teCon.text.toString());
+                  onDismissed: (direction) {
+                    setState(() {
+                      items.removeAt(index);
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+          Divider(
+            color: Colors.grey,
+            height: 5,
+            indent: 10,
+            endIndent: 10,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Row(
+              children: <Widget>[
+                Text("Change Item: "),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      controller: changeCon,
+                      onSubmitted: (text) {
+                        _changeItem();
                       },
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.only(left: 5),
-                    width: 55,
-                    child: RaisedButton(
-                      padding: const EdgeInsets.all(0),
-                      color: Colors.grey,
-                      textColor: Colors.white,
-                      child: Text("launch", style: ts),
-                      onPressed: () {
-                        _launchUrl(teCon.text.toString());
+                ),
+                RaisedButton(
+                  child: Text("Change"),
+                  onPressed: () {
+                    _changeItem();
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Row(
+              children: <Widget>[
+                Text("Insert Item: "),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      controller: insertCon,
+                      onSubmitted: (text) {
+                        setState(() {
+                          if (insertCon.text != "") {
+                            items.add(insertCon.text);
+                          }
+                        });
+                        insertCon.clear();
                       },
                     ),
                   ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  border: Border.all(color: Colors.grey, width: 1),
                 ),
-                child: Center(
-                  child: (response == null)
-                      ? CircularProgressIndicator()
-                      : SingleChildScrollView(
-                      child: Text(response, style: TextStyle(fontSize: 13))
-                  ),
+                RaisedButton(
+                  child: Text("Insert"),
+                  onPressed: () {
+                    setState(() {
+                      if (insertCon.text != "") {
+                        items.add(insertCon.text);
+                      }
+                    });
+                    insertCon.clear();
+                  },
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  customButton(String text, String url) {
-    return Container(
-      width: 70,
-      child: RaisedButton(
-        padding: const EdgeInsets.all(0),
-        color: Colors.blue,
-        textColor: Colors.white,
-        child: Text(text, style: ts),
-        onPressed: () {
-          teCon.text = url;
-        },
-      ),
-    );
-  }
-
-  _getUrl(String url) async {
-    setState(() {
-      response = null;
-    });
-    var temp = await http.get(url);
-    setState(() {
-      response = temp.body;
-    });
-  }
-
-  _launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+  void _changeItem() {
+    if (selectedIndex == null || changeCon.text.isEmpty) {
+      return;
     }
-    else {
-      scaffoldKey.currentState
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text("'$url' is invalid a URL"),
-              backgroundColor: Colors.deepOrange,
-              action: SnackBarAction(
-                label: "Done",
-                textColor: Colors.white,
-                onPressed: () {},
-              ),
-            ),
-          );
-    }
+    print("selectedIndex: $selectedIndex, changedText: ${changeCon.text}");
+    setState(() {
+      items[selectedIndex] = changeCon.text;
+    });
+    selectedIndex = null;
+    changeCon.text = "";
   }
 }
