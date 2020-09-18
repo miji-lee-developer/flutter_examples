@@ -27,66 +27,11 @@ class MainPage extends StatelessWidget {
       body: Center(child: SwipeList()),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showDialogForAdd(context);
+          CircleWidgets.showDialogForAdd(context, _formKey);
         },
         child: Icon(Icons.add),
         backgroundColor: Colors.blueAccent,
       ),
-    );
-  }
-
-  showDialogForAdd(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Stack(
-            overflow: Overflow.visible,
-            children: <Widget>[
-              Positioned(
-                right: -40.0,
-                top: -40.0,
-                child: InkResponse(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: CircleAvatar(
-                    child: Icon(Icons.close),
-                    backgroundColor: Colors.red,
-                  ),
-                ),
-              ),
-              Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: TextFormField(),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: TextFormField(),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        child: Text("Submit"),
-                        onPressed: () {
-                          if (_formKey.currentState.validate()) {
-                            _formKey.currentState.save();
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }
@@ -100,6 +45,7 @@ class SwipeList extends StatefulWidget {
 
 class CircleWidgets extends State<SwipeList> {
   List items = getDummyList();
+  TextEditingController itemController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +75,7 @@ class CircleWidgets extends State<SwipeList> {
             },
             child: Container(
               height: 50.0,
-              decoration: BoxDecoration(border: Border.all(width: 1.0)),
+              decoration: BoxDecoration(border: Border.all(width: 0.2, color: Colors.grey[400])),
               padding: EdgeInsets.all(5.0),
               child: Row(
                 children: <Widget>[
@@ -151,5 +97,70 @@ class CircleWidgets extends State<SwipeList> {
       return "Item ${i + 1}";
     });
     return list;
+  }
+
+  static showDialogForAdd(BuildContext context, GlobalKey<FormState> _formKey) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Stack(
+            overflow: Overflow.visible,
+            children: <Widget>[
+              Positioned(
+                right: -40.0,
+                top: -40.0,
+                child: InkResponse(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: CircleAvatar(
+                    child: Icon(Icons.close),
+                    backgroundColor: Colors.red,
+                  ),
+                ),
+              ),
+              Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: CircleWidgets().itemController,
+                        decoration: InputDecoration(
+                          labelText: "Enter item :)",
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return "Enter item";
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: RaisedButton(
+                        child: Text("Submit"),
+                        onPressed: () {
+                          if (_formKey.currentState.validate()) {
+                            _formKey.currentState.save();
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
