@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'bloc_base.dart';
 
 class MainApp extends StatelessWidget {
   @override
@@ -10,7 +11,10 @@ class MainApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: CounterPage(),
+      home: BlocProvider<IncrementBloc>(
+        bloc: IncrementBloc(),
+        child: CounterPage(),
+      ),
     );
   }
 }
@@ -21,25 +25,17 @@ class CounterPage extends StatefulWidget {
 }
 
 class _CounterPageState extends State<CounterPage> {
-  int _counter = 0;
-  // Step1 StreamController
-  final StreamController<int> _streamController = StreamController<int>();
-
-  @override
-  void dispose(){
-    _streamController.close();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final IncrementBloc bloc = BlocProvider.of<IncrementBloc>(context);
+
     return Scaffold(
       appBar: AppBar(title: Text('Stream version of the Counter App')),
       body: Center(
         child: StreamBuilder<int>(
             // Step2 Stream Listener
-            stream: _streamController.stream,
-            initialData: _counter,
+            stream: bloc.outCounter,
+            initialData: 0,
             builder: (BuildContext context, AsyncSnapshot<int> snapshot){
               return Text('You hit me: ${snapshot.data} times');
           }
@@ -49,9 +45,35 @@ class _CounterPageState extends State<CounterPage> {
         child: const Icon(Icons.add),
         onPressed: (){
           // add to StreamController
-          _streamController.sink.add(++_counter);
+          bloc.incrementCounter.add(null);
         },
       ),
     );
+  }
+}
+
+class IncrementBloc implements BlocBase {
+  int _counter;
+
+  StreamController<int> _counterController = StreamController<int>();
+  StreamSink<int> get _inAdd => _counterController.sink;
+  Stream<int> get outCounter => _counterController.stream;
+
+  StreamController _actionController = StreamController();
+  StreamSink get incrementCounter => _actionController.sink;
+
+  IncrementBloc() {
+    _counter = 0;
+    _actionController.stream.listen(_handleLogic);
+  }
+
+  void dispose() {
+    _actionController.close();
+    _counterController.close();
+  }
+
+  void _handleLogic(data) {
+    _counter = _counter + 1;
+    _inAdd.add(_counter);
   }
 }
