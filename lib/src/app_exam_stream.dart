@@ -41,11 +41,32 @@ class _CounterPageState extends State<CounterPage> {
           }
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: (){
-          // add to StreamController
-          bloc.incrementCounter.add(null);
+      // floatingActionButton: FloatingActionButton(
+      //   child: const Icon(Icons.add),
+      //   onPressed: (){
+      //     // add to StreamController
+      //     bloc.incrementCounter.add(null);
+      //   },
+      // ),
+      floatingActionButton: new Builder(
+        builder: (context) {
+          return new FloatingActionButton(
+              child: const Icon(Icons.add),
+              onPressed: () {
+                bloc.incrementCounter.add(null);
+
+                Scaffold.of(context).showSnackBar(
+                  new SnackBar(
+                    backgroundColor: Colors.blue,
+                    content: new Text('SnackBar'),
+                    action: SnackBarAction(
+                      label: "Done",
+                      textColor: Colors.white,
+                      onPressed: () {},
+                    ),
+                  ),
+                );
+          });
         },
       ),
     );
