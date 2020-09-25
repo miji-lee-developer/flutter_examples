@@ -24,15 +24,16 @@ class TodoListState extends State<TodoList> {
       itemCount: _todoItems.length,
       itemBuilder: (context, index) {
         if (index < _todoItems.length) {
-          return _buildTodoItem(_todoItems[index]);
+          return _buildTodoItem(_todoItems[index], index);
         }
       },
     );
   }
 
-  Widget _buildTodoItem(String todoText) {
+  Widget _buildTodoItem(String todoText, int index) {
     return new ListTile(
       title: Text(todoText),
+      onTap: () => _promptRemoveTodoItem(index),
     );
   }
 
@@ -40,6 +41,34 @@ class TodoListState extends State<TodoList> {
     setState(() {
       _todoItems.add(item);
     });
+  }
+
+  _removeTodoItem(int index) {
+    setState(() => _todoItems.removeAt(index));
+  }
+
+  _promptRemoveTodoItem(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text('Do you want to complete "${_todoItems[index]}"?'),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text('CANCEL'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            new FlatButton(
+              child: new Text('OK'),
+              onPressed: () {
+                _removeTodoItem(index);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _navigatorAddItemScreen() async {
