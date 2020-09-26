@@ -29,6 +29,7 @@
 .pub-cache/
 .pub/
 /build/
+lib/youtube_clone_app/src/commons/api_key.dart
 
 # Web related
 lib/generated_plugin_registrant.dart
