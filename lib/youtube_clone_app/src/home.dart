@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'tabs/youtubeScreen.dart';
-import 'tabs/NearByScreen.dart';
-import 'tabs/ChatScreen.dart';
-
-import 'commons/colors.dart';
+import 'package:flutter_app_examples/youtube_clone_app/src/models/UserData.dart';
+import 'package:flutter_app_examples/youtube_clone_app/src/commons/colors.dart';
+import 'package:flutter_app_examples/youtube_clone_app/src/tabs/youtubeScreen.dart';
+import 'package:flutter_app_examples/youtube_clone_app/src/tabs/NearByScreen.dart';
+import 'package:flutter_app_examples/youtube_clone_app/src/tabs/ChatScreen.dart';
+import 'package:flutter_app_examples/youtube_clone_app/src/utils/fb_api_provider.dart';
 
 class Home extends StatefulWidget {
   @override
