@@ -14,6 +14,7 @@ class Home extends StatefulWidget {
 
 class HomeState extends State<Home> {
   var _tabIndex = 0;
+  final List<Widget> _tabs = [YoutubeScreen(), ChatScreen(), NearByScreen()];
 
   @override
   Widget build(BuildContext context) {
