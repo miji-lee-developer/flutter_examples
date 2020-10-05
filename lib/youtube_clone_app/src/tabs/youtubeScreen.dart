@@ -17,7 +17,7 @@ Future<List<VideoData>> _getVideos() async {
   dynamic resBody = json.decode(response.body);
   List videosResData = resBody["items"];
 
-  videoResData.forEach((item) => videoDataList.add(new VideoData(item)));
+  videosResData.forEach((item) => videoDataList.add(new VideoData(item)));
 
   for (var videoData in videoDataList) {
     String channelDataURL = "https://www.googleapis.com/youtube/v3/channels?key=$youtubeApiKey&part=snippet&id=${videoData.getOwnerChannelId}";
@@ -182,7 +182,7 @@ class _YoutubeState extends State<YoutubeScreen> with AutomaticKeepAliveClientMi
     ),
   );
 
-  _bottonSheetListTile(IconData icon, String text, Function onTap) =>
+  _bottomSheetListTile(IconData icon, String text, Function onTap) =>
       ListTile(
         leading: Icon(icon, color: TextColor),
         title: Text(text, style: TextStyle(color: TextColor)),

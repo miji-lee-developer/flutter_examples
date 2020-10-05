@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'src/app_todo.dart';
+import 'package:flutter_app_examples/youtube_clone_app/src/app.dart';
 
 void main() {
-  runApp(MainApp());
+  runApp(App());
 }
